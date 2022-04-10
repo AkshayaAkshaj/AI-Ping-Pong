@@ -12,6 +12,10 @@ var paddle1Y;
 var  playerscore =0;
 var audio1;
 var pcscore =0;
+
+var rightWrist_y="";
+var rightWrist_x="";
+var score_rightWrist="";
 //ball x and y and speedx speed y and radius
 var ball = {
     x:350/2,
@@ -21,17 +25,40 @@ var ball = {
     dy:3
 }
 
+function preload(){
+ball_touch_paddel=loadSound("ball_touch_paddel.wav");
+missed=loadSound("missed.wav");
+
+}
 function setup(){
   var canvas =  createCanvas(700,600);
   canvas.parent('canvas');
 
   video=createCapture(VIDEO);
-  video.size(600,500);
-  video.parent('canvas');
+  video.size(700,600);
+  video.hide();
+
+  poseNet=ml5.poseNet(video , modelLoaded);
+ poseNet.on('pose', gotPoses);
+}
+
+function modelLoaded(){
+  console.log("Model Loaded");
+}
+function gotPoses(results){
+  if(results.length > 0){
+console.log(results);
+
+rightWrist_x=results[0].pose.rightWrist.x;
+rightWrist_y=results[0].pose.rightWrist.y;
+
+  }
 }
 
 
 function draw(){
+
+image(video,0,0,700,600);
 
  background(0); 
 
@@ -42,6 +69,15 @@ function draw(){
  fill("black");
  stroke("black");
  rect(0,0,20,700);
+
+ if(score_rightWrist > 0.2){
+   r=Math.floor((Math.random() * 250) + 1);
+   g=Math.floor((Math.random() * 250) + 1);
+   b=Math.floor((Math.random() * 250) + 1);
+   fill(r,g,b);
+  stroke(r,g,b);
+  drawCircle(5,5);
+  }
  
    //funtion paddleInCanvas call 
    paddleInCanvas();
